@@ -26,10 +26,11 @@ function confirm () {
 }
 
 # check input 
-while getopts "fhd:" flag
+while getopts "flhd:" flag
 do
 	case $flag in
 		f) opt_f=true;;
+		l) opt_l=true;;
 		d) TARGET_DIR=$OPTARG;;
 		h|*) opt_h=true;;
     esac
@@ -38,6 +39,7 @@ if [ $opt_h ]
 then
 	echo "-h help"
 	echo "-f never prompt"
+	echo "-l list up files only(not remove files)"
 	echo "-d directory(default ~/.m2/repository/)"
 	exit;
 fi
@@ -69,6 +71,11 @@ for (( i = 0; i < ${#PROBLEM_FILES[@]}; ++i ))
 do
 	echo ${PROBLEM_FILES[$i]}
 done
+
+if [ $opt_l ]
+then
+	exit 0
+fi
 
 confirm "remove files"
 
