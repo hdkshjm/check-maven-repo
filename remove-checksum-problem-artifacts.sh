@@ -6,7 +6,7 @@ TARGET_DIR="${HOME}/.m2/repository/"
 PARALLELISM=3
 
 function sort_problem_files() {
-	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done | sort -n | uniq ))
+	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done|sort -n|uniq))
 }
 
 function confirm() {
@@ -27,7 +27,7 @@ function confirm() {
 function check() {
 	file="$1"
 	if [ -e ${file}.sha1 ]; then
-		actual_checksum=`sha1sum ${file} | awk '{print $1}'`
+		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
 		expected_checksum=`cat ${file}.sha1`
 		if [ "${actual_checksum}" != "${expected_checksum}" ]; then
 			PROBLEM_FILES=("${PROBLEM_FILES[@]}" "${file}" "${file}.sha1" )
