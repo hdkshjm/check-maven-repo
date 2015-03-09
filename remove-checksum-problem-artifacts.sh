@@ -3,6 +3,7 @@
 FILES=()
 PROBLEM_FILES=()
 TARGET_DIR="${HOME}/.m2/repository/"
+PARALLEL=3
 
 function sort_problem_files() {
 	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done|sort -n|uniq))
@@ -25,28 +26,8 @@ function confirm () {
 	return 0
 }
 
-# check input 
-while getopts "flhd:" flag
-do
-	case $flag in
-		f) opt_f=true;;
-		l) opt_l=true;;
-		d) TARGET_DIR=$OPTARG;;
-		h|*) opt_h=true;;
-    esac
-done
-if [ $opt_h ]
-then
-	echo "-h help"
-	echo "-f never prompt"
-	echo "-l list up files only(not remove files)"
-	echo "-d directory(default ~/.m2/repository/)"
-	exit;
-fi
-
-FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$"`
-
-for file in ${FILES}; do
+function check () {
+	file="$1"
 	if [ -e ${file}.sha1 ]; then
 		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
 		expected_checksum=`cat  ${file}.sha1`
@@ -62,11 +43,42 @@ for file in ${FILES}; do
 		fi
 	fi
 	if [ ! -e ${file}.sha1 -a ! -e ${file}.md5 ]; then
-		PROBLEM_FILES[${#PROBLEM_FILES[@]}]="${file}"
+		PROBLEM_FILES=("${PROBLEM_FILES[@]}" "${file}")
 	fi
-done
+}
 
+function check_files () {
+	export -f check
+
+	echo "$1"| xargs -P ${PARALLEL} -I@@@ bash -c "check @@@"
+}
+
+# check input 
+while getopts "flhd:p:" flag
+do
+	case $flag in
+		f) opt_f=true;;
+		l) opt_l=true;;
+		p) PARALLEL=$OPTARG;;
+		d) TARGET_DIR=$OPTARG;;
+		h|*) opt_h=true;;
+    esac
+done
+if [ $opt_h ]
+then
+	echo "-h help"
+	echo "-f never prompt"
+	echo "-l list up files only(not remove files)"
+	echo "-d directory(default ~/.m2/repository/)"
+	echo "-p max-procs(default 3)"
+	exit;
+fi
+
+FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$"`
+
+check_files "$FILES"
 sort_problem_files
+
 for (( i = 0; i < ${#PROBLEM_FILES[@]}; ++i ))
 do
 	echo ${PROBLEM_FILES[$i]}
