@@ -28,7 +28,7 @@ function check() {
 	file="$1"
 	if [ -e ${file}.sha1 ]; then
 		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
-		expected_checksum=`cat ${file}.sha1|awk '{print $1}`
+		expected_checksum=`cat ${file}.sha1|awk '{print $1}'`
 		if [ "${actual_checksum}" != "${expected_checksum}" ]; then
 			echo "${file}"
 			echo "${file}.sha1"
