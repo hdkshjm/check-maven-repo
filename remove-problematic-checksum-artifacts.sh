@@ -55,29 +55,34 @@ function check_files() {
 }
 
 # check input 
-while getopts "flhi:d:p:" flag
+while getopts "flai:d:p:h" flag
 do
 	case $flag in
-		i) REGEXP=$OPTARG;;
 		f) opt_f=true;;
 		l) opt_l=true;;
-		p) PARALLELISM=$OPTARG;;
+		a) opt_a=true;;
+		i) REGEXP=$OPTARG;;
 		d) TARGET_DIR=$OPTARG;;
+		p) PARALLELISM=$OPTARG;;
 		h|*) opt_h=true;;
     esac
 done
 if [ $opt_h ]
 then
 	echo "-h help"
-	echo "-i ignore file/directory name pattern(grep regexp)"
 	echo "-f never prompt"
 	echo "-l list up files only(not remove files)"
+	echo "-a check *.jar, *.war and *.pom(default: check *.jar, *.war and *.pom except *-javadoc.jar and *-sources.jar)"
+	echo "-i ignore file/directory name pattern(grep regexp)"
 	echo "-d directory(default ~/.m2/repository/)"
 	echo "-p max-procs(default 3)"
 	exit;
 fi
 
 FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$"`
+if [ $opt_a ]; then
+	FILES=`echo "$FILES"|grep -v "\-javadoc\.jar\|\-sources\.jar"`
+fi
 if [ -n "$REGEXP" ]; then
 	FILES=`echo "$FILES"|grep -v "$REGEXP"`
 fi
