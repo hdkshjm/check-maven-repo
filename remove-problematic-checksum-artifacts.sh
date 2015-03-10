@@ -30,26 +30,27 @@ function check() {
 		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
 		expected_checksum=`cat ${file}.sha1`
 		if [ "${actual_checksum}" != "${expected_checksum}" ]; then
-			PROBLEM_FILES=("${PROBLEM_FILES[@]}" "${file}" "${file}.sha1" )
+			echo "${file}"
+			echo "${file}.sha1"
 		fi
 	fi
 	if [ -e ${file}.md5 ]; then
 		actual_checksum=`md5sum ${file}|awk '{print $1}'`
 		expected_checksum=`cat ${file}.md5|awk '{print $1}'`
-
-		if [ "${actual_checksum}" != "${expected_checksum}" ]; then
-			PROBLEM_FILES=("${PROBLEM_FILES[@]}" "${file}" "${file}.md5" )
+			if [ "${actual_checksum}" != "${expected_checksum}" ]; then
+			echo "${file}"
+			echo "${file}.md5"
 		fi
 	fi
 	if [ ! -e ${file}.sha1 -a ! -e ${file}.md5 ]; then
-		PROBLEM_FILES=("${PROBLEM_FILES[@]}" "${file}")
+			echo "${file}"
 	fi
 }
 
 function check_files() {
 	export -f check
 
-	echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@"
+	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@"))
 }
 
 # check input 
