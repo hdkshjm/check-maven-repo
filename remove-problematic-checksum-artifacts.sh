@@ -4,6 +4,7 @@ FILES=()
 PROBLEM_FILES=()
 TARGET_DIR="${HOME}/.m2/repository/"
 PARALLELISM=3
+REGEXP=""
 
 function sort_problem_files() {
 	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done|sort -n|uniq))
@@ -54,9 +55,10 @@ function check_files() {
 }
 
 # check input 
-while getopts "flhd:p:" flag
+while getopts "flhi:d:p:" flag
 do
 	case $flag in
+		i) REGEXP=$OPTARG;;
 		f) opt_f=true;;
 		l) opt_l=true;;
 		p) PARALLELISM=$OPTARG;;
@@ -67,6 +69,7 @@ done
 if [ $opt_h ]
 then
 	echo "-h help"
+	echo "-i ignore file/directory name pattern(grep regexp)"
 	echo "-f never prompt"
 	echo "-l list up files only(not remove files)"
 	echo "-d directory(default ~/.m2/repository/)"
@@ -75,6 +78,10 @@ then
 fi
 
 FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$"`
+if [ -n "$REGEXP" ]; then
+	FILES=`echo "$FILES"|grep -v "$REGEXP"`
+fi
+
 
 check_files "$FILES"
 sort_problem_files
