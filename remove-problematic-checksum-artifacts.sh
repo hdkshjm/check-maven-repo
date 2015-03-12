@@ -26,24 +26,34 @@ function confirm() {
 }
 
 function check() {
+#On Nexus Professional, there are some the checksum file format
+#1st hash
+## cat aa-1.0.0.jar.sha1
+## b520042133e1cf4969aa269fe013468d0d176106
+#2nd file-name hash
+## cat aa-1.0.0.jar.sha1
+## aa-1.0.0.jar b520042133e1cf4969aa269fe013468d0d176106
+#3rd SHA1(file-name) hash
+## cat aa-1.0.0.jar.sha1
+## SHA1(aa-1.0.0.jar)= b520042133e1cf4969aa269fe013468d0d176106
 	file="$1"
 	if [ -e ${file}.sha1 ]; then
 		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
-		expected_checksum=`cat ${file}.sha1|awk '{print $1}'`
-		if [ "${actual_checksum}" != "${expected_checksum}" ]; then
+		cat ${file}.sha1|grep ${actual_checksum} > /dev/null
+		if [ $? -ne 0 ]; then
 			echo "${file}"
 			echo "${file}.sha1"
 		fi
 	fi
 	if [ -e ${file}.md5 ]; then
 		actual_checksum=`md5sum ${file}|awk '{print $1}'`
-		expected_checksum=`cat ${file}.md5|awk '{print $1}'`
-			if [ "${actual_checksum}" != "${expected_checksum}" ]; then
+		cat ${file}.md5|grep ${actual_checksum} > /dev/null
+		if [ $? -ne 0 ]; then
 			echo "${file}"
 			echo "${file}.md5"
 		fi
 	fi
-	if [ ! -e ${file}.sha1 -a ! -e ${file}.md5 ]; then
+	if [ ! -e ${file}.sha1 -a ! -e ${file}.md5 ] && [ $opt_n ]; then
 			echo "${file}"
 	fi
 }
@@ -55,12 +65,13 @@ function check_files() {
 }
 
 # check input 
-while getopts "flai:d:p:h" flag
+while getopts "flani:d:p:h" flag
 do
 	case $flag in
 		f) opt_f=true;;
 		l) opt_l=true;;
 		a) opt_a=true;;
+		n) opt_n=true;;
 		i) REGEXP=$OPTARG;;
 		d) TARGET_DIR=$OPTARG;;
 		p) PARALLELISM=$OPTARG;;
@@ -73,6 +84,7 @@ then
 	echo "-f never prompt"
 	echo "-l list up files only(not remove files)"
 	echo "-a check *.jar, *.war and *.pom(default: check *.jar, *.war and *.pom except *-javadoc.jar and *-sources.jar)"
+	echo "-n not check *.jar, *.war and *.pom which checksum(md5,sha1) file is not present"
 	echo "-i ignore file/directory name pattern(grep regexp)"
 	echo "-d directory(default ~/.m2/repository/)"
 	echo "-p max-procs(default 3)"
