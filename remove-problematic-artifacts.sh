@@ -27,9 +27,9 @@ function confirm() {
 
 function check() {
 	local file="$1"
-	local arg_l="$2"
+	local arg_e="$2"
 	local arg_n="$3"
-	local arg_e="$4"
+	local arg_l="$4"
 
 	if [[ "${file}" =~ .*\.lastUpdated$ ]] && [ $arg_l ]; then
 		echo "${file}"
@@ -77,7 +77,7 @@ function check() {
 function check_files() {
 	export -f check
 
-	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ $opt_l $opt_n $opt_e"))
+	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ $opt_e $opt_n $opt_l"))
 }
 
 # check input 
