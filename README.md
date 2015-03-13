@@ -4,6 +4,7 @@
 maven repositoryにおいて、checksum error、checksumのないartifacts、download失敗したときのlastupdateを削除する
 
 # 使い方
+## help
 ````
 remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-l|-p]
   -h help
@@ -17,13 +18,11 @@ remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-l|-p]
   -d directory(default ~/.m2/repository/)
   -p max-procs(default 3)
 ````
-
-# -javadoc.jar や -sources.jar をcheckしたくない場合
+## -javadoc.jar や -sources.jar をcheckしたくない場合
 ````
 remove-problematic-artifacts.sh -e -i "\-javadoc\.jar\|\-sources\.jar"
 ````
-
-# Sonatype Nexusにおいてrepositoryのmeta情報を格納する /.nexus/attributes/ をcheckしたくない場合
+## Sonatype Nexusにおいてrepositoryのmeta情報を格納する /.nexus/attributes/ をcheckしたくない場合
 ````
 remove-problematic-artifacts.sh -e -i "/\.nexus/attributes/"
 ````
