@@ -26,6 +26,13 @@ function confirm() {
 }
 
 function check() {
+	file="$1"
+	
+	if [[ "${file}" =~ .*\.lastUpdated$ ]]; then
+		echo "${file}"
+		return 0
+	fi
+
 #On Nexus Professional, there are some the checksum file format
 #1st hash
 ## cat aa-1.0.0.jar.sha1
@@ -36,7 +43,6 @@ function check() {
 #3rd SHA1(file-name) hash
 ## cat aa-1.0.0.jar.sha1
 ## SHA1(aa-1.0.0.jar)= b520042133e1cf4969aa269fe013468d0d176106
-	file="$1"
 	if [ -e ${file}.sha1 ]; then
 		actual_checksum=`sha1sum ${file}|awk '{print $1}'`
 		cat ${file}.sha1|grep ${actual_checksum} > /dev/null
@@ -83,7 +89,7 @@ then
 	echo "-h help"
 	echo "-f never prompt"
 	echo "-l list up files only(not remove files)"
-	echo "-a check *.jar, *.war and *.pom(default: check *.jar, *.war and *.pom except *-javadoc.jar and *-sources.jar)"
+	echo "-a check *.jar, *.war, *.pom and *.lastUpdated (default: check *.jar, *.war, *.pom and *.lastUpdated except *-javadoc.jar and *-sources.jar)"
 	echo "-n not check *.jar, *.war and *.pom which checksum(md5,sha1) file is not present"
 	echo "-i ignore file/directory name pattern(grep regexp)"
 	echo "-d directory(default ~/.m2/repository/)"
@@ -91,7 +97,7 @@ then
 	exit;
 fi
 
-FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$"`
+FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$\|\.lastUpdated$"`
 if [ $opt_a ]; then
 	FILES=`echo "$FILES"|grep -v "\-javadoc\.jar\|\-sources\.jar"`
 fi
