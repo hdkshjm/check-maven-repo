@@ -6,7 +6,7 @@ maven repositoryにおいて、checksum error、checksumのないartifacts、dow
 # 使い方
 ## help
 ````
-remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-l|-p]
+remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-d|-p]
   -h help
   -f never prompt
   -s show files only(not remove files)
