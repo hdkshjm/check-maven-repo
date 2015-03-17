@@ -105,7 +105,7 @@ if [ ! $opt_e ] && [ ! $opt_l ] && [ ! $opt_n ] && [ ! $opt_o ]; then
 fi
 
 if [ $opt_h ]; then
-	echo "remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-l|-p]"
+	echo "remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-d|-p]"
 	echo ""
 	echo "-h help"
 	echo "-f never prompt"
