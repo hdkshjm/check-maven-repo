@@ -77,8 +77,7 @@ function check() {
 function check_files() {
 	export -f check
 
-	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ ${opt_e:-''} ${opt_n:-''} ${op
-t_l:-''}"))
+	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ ${opt_e:-''} ${opt_n:-''} ${opt_l:-''}"))
 }
 
 # check input 
