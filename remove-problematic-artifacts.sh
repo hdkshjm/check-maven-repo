@@ -81,6 +81,12 @@ function check_files() {
 }
 
 # check input 
+opt_f=false
+opt_s=false
+opt_e=false
+opt_n=false
+opt_l=false
+opt_h=false
 while getopts "fsenlai:d:p:h" flag
 do
 	case $flag in
