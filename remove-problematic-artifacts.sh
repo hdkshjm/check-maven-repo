@@ -7,8 +7,7 @@ PARALLELISM=3
 REGEXP=""
 
 function sort_problem_files() {
-    PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ ${opt_e:-''} ${opt_n:-''} ${op
-t_l:-''}"))
+	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done|sort -n|uniq))
 }
 
 function confirm() {
@@ -78,7 +77,8 @@ function check() {
 function check_files() {
 	export -f check
 
-	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ $opt_e $opt_n $opt_l"))
+	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ ${opt_e:-''} ${opt_n:-''} ${op
+t_l:-''}"))
 }
 
 # check input 
