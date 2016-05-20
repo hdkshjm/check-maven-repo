@@ -24,7 +24,7 @@ remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-d|-p]
 remove-problematic-artifacts.sh -e -s -i "/\.nexus/attributes/" -d ${NEXUS_HOME}
 ````
 
-==================
+---
 
 maven repositoryにおいて、checksum error、checksumのないartifacts、download失敗したときのlastupdateを削除する
 
