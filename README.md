@@ -17,7 +17,7 @@ remove-problematic-artifacts.sh -e|-n|-l|-a [-i|-d|-p]
   -i ignore file/directory name pattern(grep regexp)
   -d directory(default ~/.m2/repository/)
   -p max-procs(default 3)
-
+````
 
 ## On Sonatype Nexus, find the artifacts which checksum are incorrect, except Nexus meta dir /.nexus/attributes/
 ````
