@@ -5,10 +5,7 @@ PROBLEM_FILES=""
 TARGET_DIR="${HOME}/.m2/repository/"
 PARALLELISM=3
 REGEXP=""
-
-function sort_problem_files() {
-	PROBLEM_FILES=`echo "${PROBLEM_FILES}"|sort -n|uniq`
-}
+SCRIPT_DIR=`echo $(cd $(dirname $0);pwd)`
 
 function confirm() {
 	if [ $opt_f ]; then
@@ -23,61 +20,6 @@ function confirm() {
 		exit 0
 	fi
 	return 0
-}
-
-function check() {
-	local file="$1"
-	local arg_e="$2"
-	local arg_n="$3"
-	local arg_l="$4"
-
-	if [[ "${file}" =~ .*\.lastUpdated$ ]] && [ $arg_l ]; then
-		echo "${file}"
-		return 0
-	fi
-	
-	if [ ! -e "${file}.sha1" -a ! -e "${file}.md5" ] && [ $arg_n ]; then
-		echo "${file}"
-		return 0
-	fi
-	
-	#On Nexus Professional, there are some the checksum file format
-	#1st hash
-	## cat aa-1.0.0.jar.sha1
-	## b520042133e1cf4969aa269fe013468d0d176106
-	#2nd file-name hash
-	## cat aa-1.0.0.jar.sha1
-	## aa-1.0.0.jar b520042133e1cf4969aa269fe013468d0d176106
-	#3rd SHA1(file-name) hash
-	## cat aa-1.0.0.jar.sha1
-	## SHA1(aa-1.0.0.jar)= b520042133e1cf4969aa269fe013468d0d176106
-	if [ ! $arg_e ]; then
-		return 0
-	fi
-	if [ -e "${file}.sha1" ]; then
-		local actual_checksum=`sha1sum "${file}"|awk '{print $1}'`
-		cat "${file}.sha1"|grep ${actual_checksum} > /dev/null
-		if [ $? -ne 0 ]; then
-			echo "${file}"
-			echo "${file}.sha1"
-		fi
-	fi
-	if [ -e "${file}.md5" ]; then
-		local actual_checksum=`md5sum "${file}"|awk '{print $1}'`
-		cat "${file}.md5"|grep ${actual_checksum} > /dev/null
-		if [ $? -ne 0 ]; then
-			echo "${file}"
-			echo "${file}.md5"
-		fi
-	fi
-
-
-}
-
-function check_files() {
-	export -f check
-
-	PROBLEM_FILES=`echo "$FILES"| xargs -P ${PARALLELISM} -I@@@ bash -c "check '@@@' ${opt_e:-''} ${opt_n:-''} ${opt_l:-''}"`
 }
 
 # check input 
@@ -125,9 +67,9 @@ if [ -n "$REGEXP" ]; then
 	FILES=`echo "$FILES"|grep -v "$REGEXP"`
 fi
 
-
-check_files
-sort_problem_files
+cd "${SCRIPT_DIR}"
+PROBLEM_FILES=`echo "$FILES"| xargs -P ${PARALLELISM} -I@@@ ./check_artifact.sh "@@@" "${opt_e:-''}" "${opt_n:-''}" "${opt_l:-''}"`
+PROBLEM_FILES=`echo "${PROBLEM_FILES}"|sort -n|uniq`
 
 echo "${PROBLEM_FILES}"
 
