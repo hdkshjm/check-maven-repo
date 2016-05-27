@@ -1,13 +1,13 @@
 #!/bin/bash
 
 FILES=()
-PROBLEM_FILES=()
+PROBLEM_FILES=""
 TARGET_DIR="${HOME}/.m2/repository/"
 PARALLELISM=3
 REGEXP=""
 
 function sort_problem_files() {
-	PROBLEM_FILES=($(for file in "${PROBLEM_FILES[@]}"; do echo "$file"; done|sort -n|uniq))
+	PROBLEM_FILES=`echo "${PROBLEM_FILES}"|sort -n|uniq`
 }
 
 function confirm() {
@@ -36,7 +36,7 @@ function check() {
 		return 0
 	fi
 	
-	if [ ! -e ${file}.sha1 -a ! -e ${file}.md5 ] && [ $arg_n ]; then
+	if [ ! -e "${file}.sha1" -a ! -e "${file}.md5" ] && [ $arg_n ]; then
 		echo "${file}"
 		return 0
 	fi
@@ -54,17 +54,17 @@ function check() {
 	if [ ! $arg_e ]; then
 		return 0
 	fi
-	if [ -e ${file}.sha1 ]; then
-		local actual_checksum=`sha1sum ${file}|awk '{print $1}'`
-		cat ${file}.sha1|grep ${actual_checksum} > /dev/null
+	if [ -e "${file}.sha1" ]; then
+		local actual_checksum=`sha1sum "${file}"|awk '{print $1}'`
+		cat "${file}.sha1"|grep ${actual_checksum} > /dev/null
 		if [ $? -ne 0 ]; then
 			echo "${file}"
 			echo "${file}.sha1"
 		fi
 	fi
-	if [ -e ${file}.md5 ]; then
-		local actual_checksum=`md5sum ${file}|awk '{print $1}'`
-		cat ${file}.md5|grep ${actual_checksum} > /dev/null
+	if [ -e "${file}.md5" ]; then
+		local actual_checksum=`md5sum "${file}"|awk '{print $1}'`
+		cat "${file}.md5"|grep ${actual_checksum} > /dev/null
 		if [ $? -ne 0 ]; then
 			echo "${file}"
 			echo "${file}.md5"
@@ -77,7 +77,7 @@ function check() {
 function check_files() {
 	export -f check
 
-	PROBLEM_FILES=($(echo "$1"| xargs -P ${PARALLELISM} -I@@@ bash -c "check @@@ ${opt_e:-''} ${opt_n:-''} ${opt_l:-''}"))
+	PROBLEM_FILES=`echo "$FILES"| xargs -P ${PARALLELISM} -I@@@ bash -c "check '@@@' ${opt_e:-''} ${opt_n:-''} ${opt_l:-''}"`
 }
 
 # check input 
@@ -120,19 +120,16 @@ if [ $opt_h ]; then
 	exit;
 fi
 
-FILES=`find ${TARGET_DIR} -type f -print|grep "\.war$\|\.jar$\|\.pom$\|\.lastUpdated$"`
+FILES=`find "${TARGET_DIR}" -type f -print|grep "\.war$\|\.jar$\|\.pom$\|\.lastUpdated$"| while read line ; do echo "$line" ;done`
 if [ -n "$REGEXP" ]; then
 	FILES=`echo "$FILES"|grep -v "$REGEXP"`
 fi
 
 
-check_files "$FILES"
+check_files
 sort_problem_files
 
-for (( i = 0; i < ${#PROBLEM_FILES[@]}; ++i ))
-do
-	echo ${PROBLEM_FILES[$i]}
-done
+echo "${PROBLEM_FILES}"
 
 if [ $opt_s ]; then
 	exit 0
@@ -140,7 +137,4 @@ fi
 
 confirm "remove files"
 
-for (( i = 0; i < ${#PROBLEM_FILES[@]}; ++i ))
-do
-	rm ${PROBLEM_FILES[$i]}
-done
+echo "${PROBLEM_FILES}"|while read line ; do rm "$line" ;done
