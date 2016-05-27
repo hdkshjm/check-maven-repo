@@ -29,7 +29,7 @@ if [ ! $arg_e ]; then
 	exit 0
 fi
 if [ -e "${file}.sha1" ]; then
-	local actual_checksum=`sha1sum "${file}"|awk '{print $1}'`
+	actual_checksum=`sha1sum "${file}"|awk '{print $1}'`
 	cat "${file}.sha1"|grep ${actual_checksum} > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "${file}"
@@ -37,7 +37,7 @@ if [ -e "${file}.sha1" ]; then
 	fi
 fi
 if [ -e "${file}.md5" ]; then
-	local actual_checksum=`md5sum "${file}"|awk '{print $1}'`
+	actual_checksum=`md5sum "${file}"|awk '{print $1}'`
 	cat "${file}.md5"|grep ${actual_checksum} > /dev/null
 	if [ $? -ne 0 ]; then
 		echo "${file}"
